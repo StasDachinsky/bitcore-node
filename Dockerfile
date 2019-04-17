@@ -1,5 +1,11 @@
 
 FROM node:4.4.7-slim
+RUN rm /etc/apt/sources.list
+
+RUN echo "deb http://archive.debian.org/debian/ jessie main" | tee -a /etc/apt/sources.list
+RUN echo "deb-src http://archive.debian.org/debian/ jessie main" | tee -a /etc/apt/sources.list
+RUN echo "Acquire::Check-Valid-Until false;" | tee -a /etc/apt/apt.conf.d/10-nocheckvalid
+RUN echo 'Package: *\nPin: origin "archive.debian.org"\nPin-Priority: 500' | tee -a /etc/apt/preferences.d/10-archive-pin
 
 RUN apt-get update && apt-get install -y \
   g++ \
@@ -35,7 +41,7 @@ RUN rm -rf \
   /tmp/* \
   /var/lib/apt/lists/*
 
-ENV BITCOIN_NETWORK testnet
+ENV BITCOIN_NETWORK livenet
 ENTRYPOINT ["/usr/bin/dumb-init", "--", "./bitcore-node-entrypoint.sh"]
 
 VOLUME /root/bitcoin-node/data
